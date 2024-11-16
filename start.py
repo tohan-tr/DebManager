@@ -30,21 +30,20 @@ class InstallThread(QThread):
 class DebInstallerApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.check_root_access()  # Root kontrolü eklenmiştir.
+        self.check_root_access()
         self.setWindowTitle("DebManager")
         self.setFixedSize(700, 400)
 
         self.initUI()
         self.install_thread = None
         self.deb_file_path = None
-        self.installed_app_path = "/path/to/your/application"  # Application path
+        self.installed_app_path = "/path/to/your/application"
 
     def check_root_access(self):
         if os.geteuid() != 0:
-            # Kullanıcı root değilse, uyarı verilir ve uygulama kapanır
             QMessageBox.critical(self, "Root Yetkisi Gerekli", 
                                  "Bu uygulama root yetkisi gerektiriyor.\nLütfen root olup tekrar çalıştırın.")
-            sys.exit()  # Root olmayan kullanıcılar için uygulama kapanır
+            sys.exit()
 
     def initUI(self):
         menubar = self.menuBar()
