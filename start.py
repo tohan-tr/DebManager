@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QProgressBar, QFileDialog, QStackedWidget, QFrame, QMessageBox
+    QProgressBar, QFileDialog, QStackedWidget, QFrame, QMessageBox, QStyleFactory
 )
 from PyQt5.QtCore import QThread, pyqtSignal
 import subprocess
@@ -41,8 +41,8 @@ class DebInstallerApp(QMainWindow):
 
     def check_root_access(self):
         if os.geteuid() != 0:
-            QMessageBox.critical(self, "Root Yetkisi Gerekli", 
-                                 "Bu uygulama root yetkisi gerektiriyor.\nLütfen root olup tekrar çalıştırın.")
+            QMessageBox.critical(self, "Root Permission Required", 
+                                 "This application requires root permission.\nPlease run as root and try again.")
             sys.exit()
 
     def initUI(self):
@@ -58,8 +58,8 @@ class DebInstallerApp(QMainWindow):
         menu_frame.setLayout(menu_layout)
 
         buttons = {
-            "Ana Sayfa": self.show_home,
-            "Hakkında": self.show_about,
+            "Home": self.show_home,
+            "About": self.show_about,
         }
 
         for text, action in buttons.items():
@@ -67,7 +67,7 @@ class DebInstallerApp(QMainWindow):
             button.clicked.connect(action)
             menu_layout.addWidget(button)
 
-        exit_button = QPushButton("Çıkış")
+        exit_button = QPushButton("Exit")
         exit_button.clicked.connect(self.close)
         menu_layout.addStretch()
         menu_layout.addWidget(exit_button)
@@ -103,13 +103,13 @@ class DebInstallerApp(QMainWindow):
 
     def init_home(self):
         layout = QVBoxLayout()
-        self.deb_file_label = QLabel("Seçilen Dosya: Yok")
+        self.deb_file_label = QLabel("Selected File: None")
         layout.addWidget(self.deb_file_label)
 
-        select_button = QPushButton("Dosya Seç")
+        select_button = QPushButton("Select File")
         select_button.clicked.connect(self.load_file)
 
-        self.load_button = QPushButton("Yükle")
+        self.load_button = QPushButton("Install")
         self.load_button.setDisabled(True)
         self.load_button.clicked.connect(self.start_installation)
 
@@ -119,10 +119,10 @@ class DebInstallerApp(QMainWindow):
 
     def init_downloads(self):
         layout = QVBoxLayout()
-        self.progress_label = QLabel("Yükleme Durumu")
+        self.progress_label = QLabel("Installation Progress")
         self.progress_bar = QProgressBar()
 
-        self.open_button = QPushButton("Uygulamayı Aç")
+        self.open_button = QPushButton("Open Application")
         self.open_button.setDisabled(True)
         self.open_button.clicked.connect(self.open_application)
 
@@ -135,12 +135,12 @@ class DebInstallerApp(QMainWindow):
         layout = QVBoxLayout()
         settings = self.load_settings()
 
-        version_label = QLabel(f"Sürüm: {settings['version']}")
-        update_label = QLabel("Güncelleme Tarihi: 24/10/2024")
-        size_label = QLabel("İndirme Boyutu: 6.7 KİB")
-        os_label = QLabel("Gerekli İşletim Sistemi: Linux")
-        provider_label = QLabel("Sunan: TOHAN")
-        release_label = QLabel("Çıkış Tarihi: 24/10/2024")
+        version_label = QLabel(f"Version: {settings['version']}")
+        update_label = QLabel("Last Update: 24/10/2024")
+        size_label = QLabel("Download Size: 6.7 KB")
+        os_label = QLabel("Required OS: Linux")
+        provider_label = QLabel("Provider: TOHAN")
+        release_label = QLabel("Release Date: 24/10/2024")
 
         layout.addWidget(version_label)
         layout.addWidget(update_label)
@@ -151,9 +151,9 @@ class DebInstallerApp(QMainWindow):
         self.about_widget.setLayout(layout)
 
     def load_file(self):
-        self.deb_file_path, _ = QFileDialog.getOpenFileName(self, "Deb Dosyası Seç", "", "Deb Dosyaları (*.deb)")
+        self.deb_file_path, _ = QFileDialog.getOpenFileName(self, "Select Deb File", "", "Deb Files (*.deb)")
         if self.deb_file_path:
-            self.deb_file_label.setText(f"Seçilen Dosya: {self.deb_file_path}")
+            self.deb_file_label.setText(f"Selected File: {self.deb_file_path}")
             self.load_button.setEnabled(True)
 
     def start_installation(self):
@@ -170,10 +170,10 @@ class DebInstallerApp(QMainWindow):
 
     def installation_finished(self, success):
         if success:
-            QMessageBox.information(self, "Başarılı", "Kurulum başarılı!")
+            QMessageBox.information(self, "Success", "Installation successful!")
             self.open_button.setEnabled(True)
         else:
-            QMessageBox.critical(self, "Hata", "Kurulum sırasında bir hata oluştu.")
+            QMessageBox.critical(self, "Error", "An error occurred during installation.")
 
     def open_application(self):
         os.startfile(self.installed_app_path)
@@ -188,5 +188,8 @@ class DebInstallerApp(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = DebInstallerApp()
+    
+    app.setStyle(QStyleFactory.create("Fusion"))
+    
     window.show()
     sys.exit(app.exec_())
