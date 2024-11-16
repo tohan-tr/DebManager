@@ -19,7 +19,7 @@ Installation
 
     Clone the repository:
 
-git clone https://github.com/username/DebManager.git
+git clone https://github.com/tohan-tr/DebManager
 
 Install the necessary dependencies:
 
